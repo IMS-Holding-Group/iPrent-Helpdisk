@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}Login - iPrent Helpdisk{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <h1>Login</h1>
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <div class="login-hints">
+            <p><strong>Demo Accounts:</strong></p>
+            <ul>
+                <li><i class="fas fa-user-shield"></i> Admin: <code>admin</code> / <code>admin123</code></li>
+                <li><i class="fas fa-headset"></i> Support: <code>support</code> / <code>support123</code></li>
+                <li><i class="fas fa-user"></i> Employee: <code>employee</code> / <code>employee123</code></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

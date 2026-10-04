@@ -1,0 +1,208 @@
+{% extends "layout.html" %}
+
+{% block title %}View Ticket #{{ ticket.id }} - iPrent Helpdisk{% endblock %}
+
+{% block content %}
+<div class="ticket-view">
+    <div class="ticket-header">
+        <h1>Ticket #{{ ticket.id }}</h1>
+        <a href="{{ url_for('dashboard') }}" class="btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="ticket-details">
+        <div class="detail-row">
+            <strong>Title:</strong>
+            <span>{{ ticket.title or 'No title' }}</span>
+        </div>
+        {% if ticket.ticket_type %}
+        <div class="detail-row">
+            <strong>Problem Type:</strong>
+            <span>
+                {% if ticket.ticket_type == 'printer' %}Printers
+                {% elif ticket.ticket_type == 'network' %}Networks
+                {% elif ticket.ticket_type == 'hardware' %}Hardware
+                {% elif ticket.ticket_type == 'software' %}Software
+                {% else %}Other{% endif %}
+            </span>
+        </div>
+        {% endif %}
+        {% if ticket.device_name %}
+        <div class="detail-row">
+            <strong>Affected Device/System:</strong>
+            <span>{{ ticket.device_name }}</span>
+        </div>
+        {% endif %}
+        {% if ticket.affected_users_count and ticket.affected_users_count > 1 %}
+        <div class="detail-row">
+            <strong>Affected Users Count:</strong>
+            <span>{{ ticket.affected_users_count }}</span>
+        </div>
+        {% endif %}
+        <div class="detail-row">
+            <strong>Printer:</strong>
+            <span>{{ printer.name if printer else 'Not specified' }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Status:</strong>
+            <span class="status-badge status-{{ ticket.status.lower().replace(' ', '-') }}">{{ ticket.status }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Priority:</strong>
+            <span class="priority-badge priority-{{ ticket.priority.lower() }}">{{ ticket.priority }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Email:</strong>
+            <span>{{ ticket.reporter_email or 'Not specified' }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Created At:</strong>
+            <span>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') if ticket.created_at else 'Not specified' }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Last Updated:</strong>
+            <span>{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M') if ticket.updated_at else 'Not specified' }}</span>
+        </div>
+        <div class="detail-row full-width">
+            <strong>Description:</strong>
+            <p>{{ ticket.description or 'No description' }}</p>
+        </div>
+    </div>
+
+    <!-- AI Response Section -->
+    <div class="ai-response-section" id="ai-response-section" style="display: none;">
+        <h2><i class="fas fa-robot"></i> Automatic Initial Response (AI)</h2>
+        <div id="ai-response-content">
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <div class="ticket-actions">
+        <h2>Change Status</h2>
+        <select id="status-select" onchange="updateTicketStatus({{ ticket.id }})">
+            <option value="Open" {% if ticket.status == 'Open' %}selected{% endif %}>Open</option>
+            <option value="In Progress" {% if ticket.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+            <option value="Resolved" {% if ticket.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+        </select>
+    </div>
+
+    <div class="comments-section">
+        <h2>Internal Comments</h2>
+        <div id="comments-list">
+            {% for comment in comments %}
+            <div class="comment-item">
+                <div class="comment-header">
+                    <strong>{{ comment.author or 'Support Staff' }}</strong>
+                    <span class="comment-date">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') if comment.created_at else '' }}</span>
+                </div>
+                <div class="comment-message">{{ comment.message or '' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="add-comment">
+            <h3>Add Comment</h3>
+            <form id="comment-form" onsubmit="addComment(event, {{ ticket.id }})">
+                <textarea id="comment-message" rows="4" placeholder="Write your comment here..." required></textarea>
+                <button type="submit" class="btn-primary">Add Comment</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load AI response on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAIResponse({{ ticket.id }});
+    });
+
+    function loadAIResponse(ticketId) {
+        fetch(`/ticket/${ticketId}/ai-response`)
+            .then(response => {
+                if (response.status === 404) {
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    const aiSection = document.getElementById('ai-response-section');
+                    const aiContent = document.getElementById('ai-response-content');
+                    
+                    if (aiSection && aiContent) {
+                        aiContent.innerHTML = `
+                            <div class="ai-response-item">
+                                <h4><i class="fas fa-comment"></i> Initial Response:</h4>
+                                <p>${data.initial_response.replace(/\n/g, '<br>')}</p>
+                            </div>
+                            <div class="ai-response-item">
+                                <h4><i class="fas fa-list-ol"></i> Troubleshooting Steps:</h4>
+                                <pre>${data.troubleshooting_steps || 'No steps available'}</pre>
+                            </div>
+                            <div class="ai-response-item">
+                                <h4><i class="fas fa-lightbulb"></i> Common Solutions:</h4>
+                                <pre>${data.common_solutions || 'No solutions available'}</pre>
+                            </div>
+                            <div class="ai-response-item">
+                                <h4><i class="fas fa-info-circle"></i> Guidance:</h4>
+                                <p>${data.guidance || 'No guidance available'}</p>
+                            </div>
+                            <div class="ai-response-meta">
+                                <small>Confidence Score: ${(data.confidence * 100).toFixed(0)}%</small>
+                            </div>
+                        `;
+                        aiSection.style.display = 'block';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading AI response:', error);
+            });
+    }
+
+    function updateTicketStatus(ticketId) {
+        const status = document.getElementById('status-select').value;
+        
+        fetch(`/ticket/${ticketId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating status');
+        });
+    }
+
+    function addComment(event, ticketId) {
+        event.preventDefault();
+        const message = document.getElementById('comment-message').value;
+        
+        fetch(`/ticket/${ticketId}/comment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error adding comment');
+        });
+    }
+</script>
+{% endblock %}
+

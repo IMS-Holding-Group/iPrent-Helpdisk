@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.htpasswd
+node_modules/
+venv/
+.venv/
+__pycache__/
+.dart_tool/
+build/
+.gradle/
+.vs/
+*.pyc
+uploads/targets/

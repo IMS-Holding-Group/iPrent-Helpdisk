@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}iPrent Helpdisk{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        @font-face {
+            font-family: 'IBMPlexSansArabic';
+            src: url('{{ url_for("assets", filename="fonts/IBMPlexSansArabic-Regular.ttf") }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-container">
+        {% if session.user_id and session.role != 'employee' %}
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <i class="fas fa-headset"></i> iPrent Helpdisk
+                {% if session.role == 'support' %}
+                <span class="role-badge role-support">Support</span>
+                {% elif session.role == 'admin' %}
+                <span class="role-badge role-admin">Admin</span>
+                {% endif %}
+            </div>
+            <div class="nav-user">
+                <i class="fas fa-user-circle"></i> Welcome, {{ session.username }}
+            </div>
+        </nav>
+        <div class="main-layout">
+            <aside class="sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#tickets"><i class="fas fa-ticket-alt"></i> Tickets</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#printers"><i class="fas fa-print"></i> Printers</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#devices"><i class="fas fa-server"></i> Devices & Networks</a></li>
+                    {% if session.role == 'admin' %}
+                    <li><a href="{{ url_for('dashboard') }}#reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#analytics"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#predictions"><i class="fas fa-crystal-ball"></i> Predictions</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#patterns"><i class="fas fa-brain"></i> Pattern Analysis</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('dashboard') }}#alerts"><i class="fas fa-bell"></i> Alerts</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#maintenance"><i class="fas fa-calendar-check"></i> Maintenance</a></li>
+                    <li><a href="{{ url_for('dashboard') }}#settings"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </aside>
+            <main class="main-content">
+                {% else %}
+                <main class="main-content">
+                    {% endif %}
+                    {% block content %}{% endblock %}
+                </main>
+                {% if session.user_id and session.role != 'employee' %}
+        </div>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

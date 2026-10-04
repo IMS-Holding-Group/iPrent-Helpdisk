@@ -1,0 +1,77 @@
+{% extends "portal_layout.html" %}
+
+{% block title %}Employee Portal - iPrent Helpdisk{% endblock %}
+
+{% block content %}
+<div class="employee-portal">
+    <div class="portal-header">
+        <h1><i class="fas fa-life-ring"></i> IT Support Portal</h1>
+        <p class="section-description">Submit a new support request or track your existing tickets</p>
+    </div>
+
+    <div class="portal-tabs">
+        <button class="portal-tab active" data-tab="new-ticket" onclick="switchPortalTab('new-ticket')">
+            <i class="fas fa-plus-circle"></i> New Request
+        </button>
+        <button class="portal-tab" data-tab="my-tickets" onclick="switchPortalTab('my-tickets')">
+            <i class="fas fa-list"></i> My Tickets
+        </button>
+    </div>
+
+    <div id="new-ticket-panel" class="portal-panel active">
+        <div class="portal-card">
+            <h2><i class="fas fa-edit"></i> Submit Support Request</h2>
+            <form id="employee-ticket-form" onsubmit="submitEmployeeTicket(event)">
+                <div class="form-group">
+                    <label for="emp-ticket-type">Problem Type</label>
+                    <select id="emp-ticket-type" name="ticket_type" onchange="updateEmployeeTicketType()" required>
+                        <option value="printer">Printer Problem</option>
+                        <option value="network">Network Problem</option>
+                        <option value="hardware">Hardware Problem</option>
+                        <option value="software">Software Problem</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" id="emp-printer-group">
+                    <label for="emp-ticket-printer">Printer (Optional)</label>
+                    <select id="emp-ticket-printer" name="printer_id">
+                        <option value="">Select Printer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="emp-device-name">Device / System Name</label>
+                    <input type="text" id="emp-device-name" name="device_name" placeholder="e.g. My PC, Office Printer">
+                </div>
+                <div class="form-group">
+                    <label for="emp-ticket-title">Problem Title</label>
+                    <input type="text" id="emp-ticket-title" name="title" required placeholder="Brief summary of the issue">
+                </div>
+                <div class="form-group">
+                    <label for="emp-ticket-description">Description</label>
+                    <textarea id="emp-ticket-description" name="description" rows="5" required placeholder="Describe the problem in detail..."></textarea>
+                </div>
+                <input type="hidden" id="emp-ticket-email" value="{{ session.email or '' }}">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-paper-plane"></i> Submit Request
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="my-tickets-panel" class="portal-panel">
+        <div class="portal-card">
+            <div class="section-header">
+                <h2><i class="fas fa-ticket-alt"></i> My Tickets</h2>
+                <button class="btn-secondary" onclick="loadEmployeeTickets()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div id="employee-tickets-container" class="tickets-list">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/employee.js') }}"></script>
+{% endblock %}

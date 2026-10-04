@@ -1,0 +1,652 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - iPrent Helpdisk{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Main Dashboard Section -->
+    <div id="home-section" class="dashboard-section active">
+        <h1>Dashboard</h1>
+
+        <div class="stats-section">
+            <div class="stat-card stat-card-primary">
+                <div class="stat-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Open Tickets</h3>
+                    <p class="stat-number" id="open-tickets-count">0</p>
+                </div>
+            </div>
+            <div class="stat-card stat-card-success">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Today's Tickets</h3>
+                    <p class="stat-number" id="today-tickets-count">0</p>
+                </div>
+            </div>
+            <div class="stat-card stat-card-info">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Average Resolution Time</h3>
+                    <p class="stat-number" id="avg-resolution-time">-</p>
+                </div>
+            </div>
+            <div class="stat-card stat-card-warning">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>High Priority Tickets</h3>
+                    <p class="stat-number" id="high-priority-count">0</p>
+                </div>
+            </div>
+            <div class="stat-card stat-card-danger">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>In Progress</h3>
+                    <p class="stat-number" id="in-progress-count">0</p>
+                </div>
+            </div>
+            <div class="stat-card stat-card-secondary">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Resolved</h3>
+                    <p class="stat-number" id="resolved-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Tickets Section -->
+        <div class="section" id="recent-tickets">
+            <div class="section-header">
+                <h2><i class="fas fa-ticket-alt"></i> Latest Tickets</h2>
+                <a href="#tickets" onclick="showSection('tickets-section'); return false;" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> View All
+                </a>
+            </div>
+            <div id="recent-tickets-container" class="tickets-list">
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Printers and Devices Section -->
+        <div class="section" id="recent-printers">
+            <div class="section-header">
+                <h2><i class="fas fa-print"></i> Printers & Devices</h2>
+                <a href="#printers" onclick="showSection('printers-section'); return false;" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> View All
+                </a>
+            </div>
+            <p class="section-description">Real-time monitoring of printers, devices, and networks</p>
+            <div id="recent-printers-container" class="printers-grid">
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Devices Section -->
+        <div class="section" id="recent-devices">
+            <div class="section-header">
+                <h2><i class="fas fa-server"></i> Devices & Networks</h2>
+                <a href="#devices" onclick="showSection('devices-section'); return false;" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> View All
+                </a>
+            </div>
+            <p class="section-description">Monitor servers, network devices, and workstations</p>
+            <div id="recent-devices-container" class="devices-grid">
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Recent Alerts Section -->
+        <div class="section" id="recent-alerts">
+            <div class="section-header">
+                <h2><i class="fas fa-bell"></i> Smart Alerts</h2>
+                <a href="#alerts" onclick="showSection('alerts-section'); return false;" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> View All
+                </a>
+            </div>
+            <p class="section-description">Automatic alerts for low ink levels, offline printers, and high priority tickets</p>
+            <div id="recent-alerts-container" class="alerts-container">
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <!-- Predictions Section -->
+        <div class="section" id="recent-predictions">
+            <div class="section-header">
+                <h2><i class="fas fa-crystal-ball"></i> Ink Depletion Predictions</h2>
+                <a href="#predictions" onclick="showSection('predictions-section'); return false;"
+                    class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> View All
+                </a>
+            </div>
+            <p class="section-description">AI-powered predictions for ink depletion dates</p>
+            <div id="recent-predictions-container" class="predictions-grid">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Printers Section -->
+    <div id="printers-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-print"></i> Printers</h1>
+        <p class="section-description">Real-time monitoring of printer status and ink levels</p>
+        <div class="section" id="printers">
+            <div class="section-header">
+                <div class="section-actions">
+                    <button class="btn-secondary" onclick="refreshPrinters()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="printers-grid" id="printers-container">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Devices Section -->
+    <div id="devices-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-server"></i> Devices & Networks</h1>
+        <p class="section-description">Monitor servers, network devices, and workstations</p>
+        <div class="section" id="devices">
+            <div class="section-header">
+                <div class="section-actions">
+                    <button class="btn-secondary" onclick="refreshDevices()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="devices-grid" id="devices-container">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tickets Section -->
+    <div id="tickets-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-ticket-alt"></i> Tickets</h1>
+        <p class="section-description">Manage all support tickets with automatic classification and smart priority</p>
+        <div class="section" id="tickets">
+            <div class="section-header">
+                <button class="btn-primary" onclick="showNewTicketForm()">
+                    <i class="fas fa-plus"></i> New Ticket
+                </button>
+            </div>
+
+            <div class="filters">
+                <select id="status-filter" onchange="resetTickets()">
+                    <option value="">All Statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+                <select id="priority-filter" onchange="resetTickets()">
+                    <option value="">All Priorities</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                </select>
+                <select id="ticket-type-filter" onchange="resetTickets()">
+                    <option value="">All Types</option>
+                    <option value="printer">Printers</option>
+                    <option value="network">Networks</option>
+                    <option value="hardware">Hardware</option>
+                    <option value="software">Software</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div id="tickets-container">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Section -->
+    <div id="reports-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-chart-bar"></i> Reports</h1>
+        <p class="section-description">Comprehensive reports on tickets, printers, and system performance</p>
+        <div class="section" id="reports">
+            <div class="section-header">
+            </div>
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3><i class="fas fa-file-alt"></i> Tickets Report</h3>
+                    <p>View comprehensive report on all tickets</p>
+                    <button class="btn-secondary" onclick="generateReport('tickets')">
+                        <i class="fas fa-download"></i> Download Report
+                    </button>
+                </div>
+                <div class="report-card">
+                    <h3><i class="fas fa-print"></i> Printers Report</h3>
+                    <p>View report on printer status</p>
+                    <button class="btn-secondary" onclick="generateReport('printers')">
+                        <i class="fas fa-download"></i> Download Report
+                    </button>
+                </div>
+                <div class="report-card">
+                    <h3><i class="fas fa-chart-pie"></i> Performance Report</h3>
+                    <p>View report on system performance</p>
+                    <button class="btn-secondary" onclick="generateReport('performance')">
+                        <i class="fas fa-download"></i> Download Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Section -->
+    <div id="analytics-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-chart-line"></i> Analytics</h1>
+        <p class="section-description">Interactive charts for ticket distribution by priority, status, and timeline</p>
+        <div class="section" id="analytics">
+            <div class="section-header">
+            </div>
+            <div class="analytics-container">
+                <div class="analytics-card">
+                    <h3>Ticket Distribution by Priority</h3>
+                    <div class="chart-container" id="priority-chart">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Ticket Distribution by Status</h3>
+                    <div class="chart-container" id="status-chart">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3>Tickets in Last 7 Days</h3>
+                    <div class="chart-container" id="timeline-chart">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Smart Alerts Section -->
+    <div id="alerts-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-bell"></i> Smart Alerts</h1>
+        <p class="section-description">Automatic alerts for low ink levels, offline printers, and high priority tickets</p>
+        <div class="section" id="alerts">
+            <div class="section-header">
+                <button class="btn-secondary" onclick="loadAlerts()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div id="alerts-container" class="alerts-container">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ink Depletion Predictions Section -->
+    <div id="predictions-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-crystal-ball"></i> Ink Depletion Predictions (AI)</h1>
+        <p class="section-description">AI-powered predictions for ink depletion dates</p>
+        <div class="section" id="predictions">
+            <div class="section-header">
+            </div>
+            <div id="predictions-container" class="predictions-grid">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Scheduling Section -->
+    <div id="maintenance-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-calendar-check"></i> Automatic Maintenance Scheduling</h1>
+        <p class="section-description">Schedule and manage printer maintenance automatically and systematically</p>
+        <div class="section" id="maintenance">
+            <div class="section-header">
+                <button class="btn-primary" onclick="showMaintenanceForm()">
+                    <i class="fas fa-plus"></i> New Schedule
+                </button>
+            </div>
+            <div id="maintenance-container" class="maintenance-container">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pattern Analysis Section -->
+    <div id="patterns-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-brain"></i> Pattern Analysis & Recurring Problems</h1>
+        <p class="section-description">Smart analysis of recurring problems and failure patterns in printers</p>
+        <div class="section" id="patterns">
+            <div class="section-header">
+            </div>
+            <div class="patterns-container">
+                <div class="section-header">
+                    <select id="pattern-printer-select" class="pattern-select" onchange="onPatternPrinterChange(this.value)">
+                        <option value="">All Printers (Overview)</option>
+                    </select>
+                </div>
+                <div class="patterns-grid" id="patterns-container">
+                    <p>Loading pattern analysis...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div id="settings-section" class="dashboard-section" style="display: none;">
+        <h1><i class="fas fa-cog"></i> Settings</h1>
+        <p class="section-description">System settings, notifications, and appearance</p>
+        <div class="section" id="settings">
+            <div class="section-header">
+            </div>
+            <div class="settings-container">
+                <div class="settings-card">
+                    <h3><i class="fas fa-bell"></i> Notifications</h3>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" checked> New Ticket Notifications
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" checked> High Priority Ticket Notifications
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox"> Printer Update Notifications
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h3><i class="fas fa-palette"></i> Appearance</h3>
+                    <div class="setting-item">
+                        <label for="dark-mode-toggle">Dark Mode</label>
+                        <label class="switch">
+                            <input type="checkbox" id="dark-mode-toggle" checked onchange="toggleTheme(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Ticket Form -->
+    <div id="new-ticket-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeNewTicketForm()">&times;</span>
+            <h2><i class="fas fa-plus-circle"></i> New Ticket</h2>
+            <form id="new-ticket-form" onsubmit="submitNewTicket(event)">
+                <div class="form-group">
+                    <label for="ticket-type">Problem Type</label>
+                    <select id="ticket-type" name="ticket_type" onchange="updateTicketType()" required>
+                        <option value="printer">Printer Problems</option>
+                        <option value="network">Network Problems</option>
+                        <option value="hardware">Hardware Problems</option>
+                        <option value="software">Software & System Problems</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" id="printer-select-group">
+                    <label for="ticket-printer">Printer (Optional)</label>
+                    <select id="ticket-printer" name="printer_id">
+                        <option value="">Select Printer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ticket-device-name">Affected Device/System Name</label>
+                    <input type="text" id="ticket-device-name" name="device_name" placeholder="Example: Database Server, Router, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="ticket-affected-users">Number of Affected Users</label>
+                    <input type="number" id="ticket-affected-users" name="affected_users_count" min="1" value="1" onchange="updateAIPriority()">
+                </div>
+                <div class="form-group">
+                    <label for="ticket-title">Problem Title</label>
+                    <input type="text" id="ticket-title" name="title" required oninput="updateAIPriority()">
+                </div>
+                <div class="form-group">
+                    <label for="ticket-description">Problem Description</label>
+                    <textarea id="ticket-description" name="description" rows="4" required oninput="updateAIPriority()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="ticket-priority">Priority</label>
+                    <select id="ticket-priority" name="priority" onchange="updateAIPriority()">
+                        <option value="">Auto-detect (AI)</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                    <div id="ai-priority-suggestion" class="ai-suggestion" style="display: none;">
+                        <i class="fas fa-robot"></i> <span id="ai-priority-text"></span>
+                    </div>
+                </div>
+                <div id="ai-response-preview" class="ai-response-preview" style="display: none;">
+                    <h4><i class="fas fa-robot"></i> Automatic Initial Response Preview:</h4>
+                    <div id="ai-response-content"></div>
+                </div>
+                <div class="form-group">
+                    <label for="ticket-email">Follow-up Email</label>
+                    <input type="email" id="ticket-email" name="reporter_email">
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-check"></i> Create Ticket
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Maintenance Scheduling Form -->
+<div id="maintenance-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeMaintenanceForm()">&times;</span>
+        <h2><i class="fas fa-calendar-plus"></i> New Maintenance Schedule</h2>
+        <form id="maintenance-form" onsubmit="submitMaintenance(event)">
+            <div class="form-group">
+                <label for="maintenance-printer">Printer</label>
+                <select id="maintenance-printer" name="printer_id" required>
+                    <option value="">Select Printer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="maintenance-type">Maintenance Type</label>
+                <select id="maintenance-type" name="maintenance_type" required>
+                    <option value="cleaning">Cleaning</option>
+                    <option value="inspection">Inspection</option>
+                    <option value="repair">Repair</option>
+                    <option value="replacement">Replacement</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="maintenance-date">Maintenance Date</label>
+                <input type="datetime-local" id="maintenance-date" name="scheduled_date" required>
+            </div>
+            <div class="form-group">
+                <label for="maintenance-notes">Notes</label>
+                <textarea id="maintenance-notes" name="notes" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-check"></i> Schedule Maintenance
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const USER_ROLE = '{{ session.role or "admin" }}';
+    const ADMIN_ONLY_SECTIONS = ['reports-section', 'analytics-section', 'predictions-section', 'patterns-section'];
+
+    // Manage section display
+    function showSection(sectionId) {
+        if (USER_ROLE !== 'admin' && ADMIN_ONLY_SECTIONS.includes(sectionId)) {
+            sectionId = 'home-section';
+        }
+        // Hide all sections
+        const sections = document.querySelectorAll('.dashboard-section');
+        sections.forEach(section => {
+            section.style.display = 'none';
+            section.classList.remove('active');
+        });
+
+        // Show selected section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+            targetSection.classList.add('active');
+
+            // Load data when opening section
+            loadSectionData(sectionId);
+        }
+    }
+
+    // Load section data
+    function loadSectionData(sectionId) {
+        switch (sectionId) {
+            case 'home-section':
+                loadAllTicketsForStats();
+                loadRecentTickets();
+                loadRecentPrinters();
+                loadRecentAlerts();
+                loadRecentPredictions();
+                break;
+            case 'printers-section':
+                loadPrinters();
+                break;
+            case 'devices-section':
+                loadDevices();
+                break;
+            case 'tickets-section':
+                loadTickets(true);
+                break;
+            case 'reports-section':
+                // No data loading needed
+                break;
+            case 'analytics-section':
+                loadAnalytics();
+                break;
+            case 'alerts-section':
+                loadAlerts();
+                break;
+            case 'predictions-section':
+                loadInkPredictions();
+                break;
+            case 'maintenance-section':
+                loadMaintenanceSchedule();
+                break;
+            case 'patterns-section':
+                loadPatternsSection();
+                break;
+            case 'settings-section':
+                // No data loading needed
+                break;
+        }
+    }
+
+    // Handle sidebar menu links
+    document.addEventListener('DOMContentLoaded', function () {
+        // Bind sidebar links
+        const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+
+                // Determine section from link
+                if (href.includes('#tickets')) {
+                    showSection('tickets-section');
+                } else if (href.includes('#printers')) {
+                    showSection('printers-section');
+                } else if (href.includes('#devices')) {
+                    showSection('devices-section');
+                } else if (href.includes('#reports')) {
+                    showSection('reports-section');
+                } else if (href.includes('#analytics')) {
+                    showSection('analytics-section');
+                } else if (href.includes('#alerts')) {
+                    showSection('alerts-section');
+                } else if (href.includes('#predictions')) {
+                    showSection('predictions-section');
+                } else if (href.includes('#maintenance')) {
+                    showSection('maintenance-section');
+                } else if (href.includes('#patterns')) {
+                    showSection('patterns-section');
+                } else if (href.includes('#settings')) {
+                    showSection('settings-section');
+                } else if (href.includes('dashboard') && !href.includes('#')) {
+                    showSection('home-section');
+                } else if (href.includes('logout')) {
+                    window.location.href = href;
+                    return;
+                }
+            });
+        });
+
+        // Load initial data for main section
+        showSection('home-section');
+
+        // Load statistics immediately
+        if (typeof loadAllTicketsForStats === 'function') {
+            loadAllTicketsForStats();
+        }
+
+        // Handle page links (hash links)
+        window.addEventListener('hashchange', function () {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const sectionMap = {
+                    'tickets': 'tickets-section',
+                    'printers': 'printers-section',
+                    'devices': 'devices-section',
+                    'reports': 'reports-section',
+                    'analytics': 'analytics-section',
+                    'alerts': 'alerts-section',
+                    'predictions': 'predictions-section',
+                    'maintenance': 'maintenance-section',
+                    'patterns': 'patterns-section',
+                    'settings': 'settings-section'
+                };
+
+                if (sectionMap[hash]) {
+                    showSection(sectionMap[hash]);
+                }
+            } else {
+                showSection('home-section');
+            }
+        });
+
+        // Check hash on initial load
+        if (window.location.hash) {
+            const hash = window.location.hash.substring(1);
+            const sectionMap = {
+                'tickets': 'tickets-section',
+                'printers': 'printers-section',
+                'devices': 'devices-section',
+                'reports': 'reports-section',
+                'analytics': 'analytics-section',
+                'alerts': 'alerts-section',
+                'predictions': 'predictions-section',
+                'maintenance': 'maintenance-section',
+                'patterns': 'patterns-section',
+                'settings': 'settings-section'
+            };
+
+            if (sectionMap[hash]) {
+                showSection(sectionMap[hash]);
+            }
+        }
+    });
+</script>
+{% endblock %}

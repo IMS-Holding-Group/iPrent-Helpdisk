@@ -1,0 +1,7 @@
+{
+  "vocab_size": 5000,
+  "max_length": 200,
+  "embedding_dim": 128,
+  "trained_at": "2025-12-31T22:00:45.657615",
+  "is_trained": true
+}

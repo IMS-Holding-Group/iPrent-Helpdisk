@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Employee Portal - iPrent Helpdisk{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        @font-face {
+            font-family: 'IBMPlexSansArabic';
+            src: url('{{ url_for("assets", filename="fonts/IBMPlexSansArabic-Regular.ttf") }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-container">
+        <nav class="top-nav portal-nav">
+            <div class="nav-brand">
+                <i class="fas fa-headset"></i> iPrent Helpdisk
+                <span class="role-badge role-employee">Employee Portal</span>
+            </div>
+            <div class="portal-nav-actions">
+                <span class="nav-user"><i class="fas fa-user-circle"></i> {{ session.username }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-secondary btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </nav>
+        <main class="main-content portal-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

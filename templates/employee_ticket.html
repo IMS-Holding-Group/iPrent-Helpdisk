@@ -1,0 +1,93 @@
+{% extends "portal_layout.html" %}
+
+{% block title %}Ticket #{{ ticket.id }} - Employee Portal{% endblock %}
+
+{% block content %}
+<div class="ticket-view employee-ticket-view">
+    <div class="ticket-header">
+        <h1>Ticket #{{ ticket.id }}</h1>
+        <a href="{{ url_for('employee_portal') }}" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back to Portal</a>
+    </div>
+
+    <div class="ticket-details">
+        <div class="detail-row">
+            <strong>Title:</strong>
+            <span>{{ ticket.title or 'No title' }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Status:</strong>
+            <span class="status-badge status-{{ ticket.status.lower().replace(' ', '-') }}">{{ ticket.status }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Priority:</strong>
+            <span class="priority-badge priority-{{ ticket.priority.lower() }}">{{ ticket.priority }}</span>
+        </div>
+        {% if ticket.ticket_type %}
+        <div class="detail-row">
+            <strong>Type:</strong>
+            <span>{{ ticket.ticket_type }}</span>
+        </div>
+        {% endif %}
+        {% if ticket.device_name %}
+        <div class="detail-row">
+            <strong>Device:</strong>
+            <span>{{ ticket.device_name }}</span>
+        </div>
+        {% endif %}
+        {% if printer %}
+        <div class="detail-row">
+            <strong>Printer:</strong>
+            <span>{{ printer.name }}</span>
+        </div>
+        {% endif %}
+        <div class="detail-row">
+            <strong>Submitted:</strong>
+            <span>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') if ticket.created_at else '-' }}</span>
+        </div>
+        <div class="detail-row">
+            <strong>Last Updated:</strong>
+            <span>{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M') if ticket.updated_at else '-' }}</span>
+        </div>
+        <div class="detail-row full-width">
+            <strong>Description:</strong>
+            <p>{{ ticket.description or 'No description' }}</p>
+        </div>
+    </div>
+
+    <div class="ai-response-section" id="ai-response-section" style="display: none;">
+        <h2><i class="fas fa-robot"></i> Suggested Solutions (AI)</h2>
+        <div id="ai-response-content"><p>Loading...</p></div>
+    </div>
+
+    <div class="portal-info-box">
+        <i class="fas fa-info-circle"></i>
+        Our support team is working on your request. You will be notified when the status changes.
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('/ticket/{{ ticket.id }}/ai-response')
+        .then(response => response.status === 404 ? null : response.json())
+        .then(data => {
+            if (!data || data.error) return;
+            const section = document.getElementById('ai-response-section');
+            const content = document.getElementById('ai-response-content');
+            content.innerHTML = `
+                <div class="ai-response-item">
+                    <h4><i class="fas fa-comment"></i> Initial Response</h4>
+                    <p>${(data.initial_response || '').replace(/\n/g, '<br>')}</p>
+                </div>
+                <div class="ai-response-item">
+                    <h4><i class="fas fa-list-ol"></i> Troubleshooting Steps</h4>
+                    <pre>${data.troubleshooting_steps || 'No steps available'}</pre>
+                </div>
+                <div class="ai-response-item">
+                    <h4><i class="fas fa-lightbulb"></i> Common Solutions</h4>
+                    <pre>${data.common_solutions || 'No solutions available'}</pre>
+                </div>`;
+            section.style.display = 'block';
+        });
+});
+</script>
+{% endblock %}
