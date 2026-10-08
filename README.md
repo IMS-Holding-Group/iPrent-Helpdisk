@@ -20,7 +20,7 @@ README السابق الصحيح في وصفه العام: جمع أعطال ا�
 
 | المستخدم | كلمة المرور في المصدر | الدور | البريد المخزن |
 | --- | --- | --- | --- |
-| admin | admin123 | admin | admin@helpdesk.local |
+| admin |  | admin | admin@helpdesk.local |
 | support | support123 | support | support@helpdesk.local |
 | employee | employee123 | employee | employee@company.local |
 
@@ -372,7 +372,7 @@ README السابق يذكر `python train_model.py` اختيارياً بعد �
 | --- | --- |
 | التشغيل | `python app.py` |
 | العنوان | `http://127.0.0.1:5000/` |
-| المدير | admin / admin123 |
+| المدير | admin /  |
 | الدعم | support / support123 |
 | الموظف | employee / employee123 |
 | القاعدة | `database.db` |

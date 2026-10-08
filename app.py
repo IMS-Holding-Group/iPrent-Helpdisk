@@ -232,7 +232,7 @@ def user_can_access_ticket(ticket):
 
 def seed_default_users():
     default_users = [
-        {'username': 'admin', 'password': 'admin123', 'role': 'admin', 'email': 'admin@helpdesk.local'},
+        {'username': 'admin', 'password': '', 'role': 'admin', 'email': 'admin@helpdesk.local'},
         {'username': 'support', 'password': 'support123', 'role': 'support', 'email': 'support@helpdesk.local'},
         {'username': 'employee', 'password': 'employee123', 'role': 'employee', 'email': 'employee@company.local'},
     ]
